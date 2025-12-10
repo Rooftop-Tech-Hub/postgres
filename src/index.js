@@ -231,15 +231,15 @@ function Postgres(a, b) {
     }
   }
 
-  async function begin(options, fn) {
-    !fn && (fn = options, options = '')
+  async function begin(fn, metadata) {
     const queries = Queue()
     let savepoints = 0
       , connection
       , prepare = null
 
     try {
-      await sql.unsafe('begin ' + options.replace(/[^a-z ]/ig, ''), [], { onexecute }).execute()
+      const m = JSON.stringify(metadata)
+      await sql.unsafe(`begin read write with (metadata = ${m})`, [], { onexecute }).execute()
       return await Promise.race([
         scope(connection, fn),
         new Promise((_, reject) => connection.onclose = reject)
