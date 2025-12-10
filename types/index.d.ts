@@ -696,8 +696,7 @@ declare namespace postgres {
 
     largeObject(oid?: number | undefined, /** @default 0x00020000 | 0x00040000 */ mode?: number | undefined): Promise<LargeObject>;
 
-    begin<T>(cb: (sql: TransactionSql<TTypes>) => T | Promise<T>): Promise<UnwrapPromiseArray<T>>;
-    begin<T>(options: string, cb: (sql: TransactionSql<TTypes>) => T | Promise<T>): Promise<UnwrapPromiseArray<T>>;
+    begin<T>(cb: (sql: TransactionSql<TTypes>) => T | Promise<T>, metadata: object): Promise<UnwrapPromiseArray<T>>;
 
     array<T extends SerializableParameter<TTypes[keyof TTypes]>[] = SerializableParameter<TTypes[keyof TTypes]>[]>(value: T, type?: number | undefined): ArrayParameter<T>;
     file<T extends readonly any[] = Row[]>(path: string | Buffer | URL | number, options?: { cache?: boolean | undefined } | undefined): PendingQuery<T>;
