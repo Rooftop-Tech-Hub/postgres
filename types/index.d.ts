@@ -777,7 +777,7 @@ declare namespace postgres {
     ): PendingQuery<T>;
   }
 
-  interface Sql<TTypes extends Record<string, unknown> = {}> extends ExecuteSql {
+  interface Sql<TTypes extends Record<string, unknown> = {}> extends ExecuteSql<TTypes> {
     CLOSE: {};
     END: this["CLOSE"];
     PostgresError: typeof PostgresError;
