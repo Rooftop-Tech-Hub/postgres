@@ -657,16 +657,8 @@ declare namespace postgres {
   | SerializableParameter<T>
   | Fragment
   | Fragment[]
-
-  interface Sql<TTypes extends Record<string, unknown> = {}> {
-    /**
-     * Query helper
-     * @param first Define how the helper behave
-     * @param rest Other optional arguments, depending on the helper type
-     * @returns An helper object usable as tagged template parameter in sql queries
-     */
-    <T, K extends Rest<T>>(first: T & First<T, K, TTypes[keyof TTypes]>, ...rest: K): Return<T, K>;
-
+  
+  interface ExecuteSql<TTypes extends Record<string, unknown> = {}> {
     /**
      * Execute the SQL query passed as a template string. Can only be used as template string tag.
      * @param template The template generated from the template string
@@ -674,6 +666,17 @@ declare namespace postgres {
      * @returns A promise resolving to the result of your query
      */
     <T extends readonly (object | undefined)[] = Row[]>(template: TemplateStringsArray, ...parameters: readonly (ParameterOrFragment<TTypes[keyof TTypes]>)[]): PendingQuery<T>;
+    unsafe<T extends any[] = (Row & Iterable<Row>)[]>(query: string, parameters?: (ParameterOrJSON<TTypes[keyof TTypes]>)[] | undefined, queryOptions?: UnsafeQueryOptions | undefined): PendingQuery<T>;
+  }
+
+  interface Sql<TTypes extends Record<string, unknown> = {}> extends ExecuteSql {
+    /**
+     * Query helper
+     * @param first Define how the helper behave
+     * @param rest Other optional arguments, depending on the helper type
+     * @returns An helper object usable as tagged template parameter in sql queries
+     */
+    <T, K extends Rest<T>>(first: T & First<T, K, TTypes[keyof TTypes]>, ...rest: K): Return<T, K>;
 
     CLOSE: {};
     END: this['CLOSE'];
@@ -686,7 +689,6 @@ declare namespace postgres {
       [name in keyof TTypes]: (value: TTypes[name]) => postgres.Parameter<TTypes[name]>
     };
 
-    unsafe<T extends any[] = (Row & Iterable<Row>)[]>(query: string, parameters?: (ParameterOrJSON<TTypes[keyof TTypes]>)[] | undefined, queryOptions?: UnsafeQueryOptions | undefined): PendingQuery<T>;
     end(options?: { timeout?: number | undefined } | undefined): Promise<void>;
 
     listen(channel: string, onnotify: (value: string) => void, onlisten?: (() => void) | undefined): ListenRequest;
