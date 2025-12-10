@@ -812,7 +812,7 @@ declare namespace postgres {
 
     begin<T>(
       cb: (sql: TransactionSql<TTypes>) => T | Promise<T>,
-      metadata: object,
+      metadata?: object,
     ): Promise<UnwrapPromiseArray<T>>;
 
     array<
