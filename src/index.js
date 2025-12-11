@@ -252,7 +252,7 @@ function Postgres(a, b) {
 
     try {
       const statement = metadata
-        ? `begin read write with (metadata = ${JSON.stringify(metadata)}) `
+        ? `begin read write with (metadata = ${formatObject(metadata)}) `
         : "begin ";
       await sql.unsafe(statement, [], { onexecute }).execute();
       return await Promise.race([
@@ -261,6 +261,14 @@ function Postgres(a, b) {
       ]);
     } catch (error) {
       throw error;
+    }
+
+    function formatObject(obj) {
+      const entries = Object.entries(obj)
+        .map(([key, value]) => `${key}: '${value}'`)
+        .join(", ");
+
+      return `{ ${entries} }`;
     }
 
     async function scope(c, fn, name) {
