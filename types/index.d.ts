@@ -775,6 +775,9 @@ declare namespace postgres {
       parameters?: ParameterOrJSON<TTypes[keyof TTypes]>[] | undefined,
       queryOptions?: UnsafeQueryOptions | undefined,
     ): PendingQuery<T>;
+    typed: (<T>(value: T, oid: number) => Parameter<T>) & {
+      [name in keyof TTypes]: (value: TTypes[name]) => postgres.Parameter<TTypes[name]>;
+    };
   }
 
   interface Sql<TTypes extends Record<string, unknown> = {}> extends ExecuteSql<TTypes> {
@@ -785,9 +788,6 @@ declare namespace postgres {
     options: ParsedOptions<TTypes>;
     parameters: ConnectionParameters;
     types: this["typed"];
-    typed: (<T>(value: T, oid: number) => Parameter<T>) & {
-      [name in keyof TTypes]: (value: TTypes[name]) => postgres.Parameter<TTypes[name]>;
-    };
 
     end(options?: { timeout?: number | undefined } | undefined): Promise<void>;
 
